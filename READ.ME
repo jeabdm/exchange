@@ -1,0 +1,29 @@
+Exchange es un proyecto reactivo que esta basado en una arquitectura por capas
+montado sobre Spring Boot con web-flux y Spring Data R2DBC  para asegurar el aspecto reactivo
+desde el acceso a la base de datos hasta la entrega de la respuesta al cliente.
+
+Como base de datos usé H2, una base realacional en memoria especialmente util para hacer pruebas.
+
+La solucion tiene basicamente dos partes:
+
+1. Hay un scheduler configurado para ejecutarse cada 10 segundos, en caso de que haya timeout el
+ sistema intentará conectarse 3 veces con el servicio con 2 segundos de espera entre intentos.
+ La conexion con el servicio se hace a traves de Web Client. 
+ Clase: PriceScheduler.java
+ 
+2. los servicios solicitados se exponen a traves del controler: ExchangeController, ambos endpoint GET que reciben
+	los parametros a traves de la url, por ejemplo: http://localhost:8080/api/price/1 obtiene la cotizacion con id 1.
+	
+Al ser una aplicacion Springboot la aplicacion se inicia ejecutando la clase "ExchangeApplication" como java application,
+tambien existen dos test:
+	-PriceRepositoryTest: para probar la conexion a la base datos.
+	-ServiceTest: para probar la capa de servicios.
+ambos corren con JUnit5.
+
+Notas:
+-Para facilitar las pruebas no se accede a los datos a traves de su timestamp sino de su id, que se genera automaticamente y empieza en 1.
+-Los tests no tienen toda la cobertura que un requerimiento real deberia tener, tiene lo suficiente para demostrar conocimiento de los conceptos.
+-El mayot precio se guarda en una variable global sin proteccion para concurrencias, asumo que esta fuera del alcance del ejercicio.
+-El servicio que se consume envia el mismo dato repetidas veces, se puede optimizar para guardar solo si es diferente al anterior.
+	
+ 
